@@ -54,7 +54,7 @@ const filteredValue = ref(0);
 onMounted(() => {
     filteredList.value = lists
 
-    for (var item of filteredList.value){
+    for (var item of filteredList.value) {
         filteredValue.value += item.val
     }
 })
@@ -63,12 +63,11 @@ onMounted(() => {
 // 何番目の画像クリックか？
 let num = ref();
 let isActive = (i) => {
-    if(num.value === i) num.value = null;
+    if (num.value === i) num.value = null;
     else num.value = i;
 };
 
-const filter = (e) =>
-{
+const filter = (e) => {
     // 全体検索
     filteredList.value = lists.filter(item => {
         // オブジェクトの全ての値に対して検索
@@ -82,7 +81,7 @@ const filter = (e) =>
 
     // 合計金額
     filteredValue.value = 0
-    for (var item of filteredList.value){
+    for (var item of filteredList.value) {
         filteredValue.value += item.val
     }
 }
@@ -90,25 +89,41 @@ const filter = (e) =>
 </script>
 <template>
     <header>
-        <p>ほしい物リスト</p>
         <div class="search_wrap">
             <input type="text" @change="filter">
         </div>
+        <button>
+            <img src="/images/add.svg" alt="">
+        </button>
     </header>
     <div class="timer_wrap">
         <h3>合計金額 : {{ filteredValue.toLocaleString() }}円</h3>
         <ul>
             <li @click="isActive(i)" v-for="(list, i) in filteredList">
                 <div class="text_wrap">
-                    <p>{{ list.type }}</p>
-                    <p>{{ list.val.toLocaleString() }}円</p>
+                    <div class="category_wrap">
+                        {{ list.category }}
+                    </div>
+                    <div class="flex">
+                        <p>{{ list.type }}</p>
+                        <p>{{ list.val.toLocaleString() }}円</p>
+                    </div>
                 </div>
-                <div class="img_wrap" :class="{active: num == i}">
-                    <img :src="list.image" alt="">
+                <div class="arrow_wrap" :class="{active: num == i}">
+                    <div class="img_wrap">
+                        <img :src="list.image" alt="">
+                    </div>
                 </div>
                 <div class="remark_wrap">
-                    <p>店舗 : {{ list.sup }}</p>
-                    <p>カテゴリー : {{ list.category }}</p>
+                    <p>{{ list.sup }}</p>
+                </div>
+                <div class="icon_wrap">
+                    <button>
+                        <img src="/images/check.svg" alt="">
+                    </button>
+                    <button>
+                        <img src="/images/pen.svg" alt="">
+                    </button>
                 </div>
             </li>
         </ul>
@@ -116,122 +131,252 @@ const filter = (e) =>
 </template>
 <style lang="scss">
 $x-margin: 20px;
-$y-margin: 20px;
+$y-margin: 16px;
+$ys-margin: 8px;
 $header-h: 60px;
-$background: #2e323b;
+$header-bg: #fff;
+$accent: #7bcccf;
+$background: #f4fdff;
 $box-shadow: #222226;
+$color: #000;
 
-header{
-    background: rgba(0, 0, 0, 0.3);
-    height: $header-h;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 $x-margin;
+body *:not(html):not(style):not(br):not(tr):not(code) {
+    font-family: 'Zen Maru Gothic', serif;
 
-    p{
-        color: #fff;
-        margin: 0;
+    header {
+        background: $accent;
+        height: $header-h;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 $x-margin;
+        border-radius: 8px;
+        width: calc(100% - 24px);
+        position: fixed;
+        top: 8px;
+        left: 12px;
+        z-index: 100;
+
+        button {
+            background: none;
+            box-shadow: none;
+            border: none;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+        }
+
+        p {
+            color: $color;
+            margin: 0;
+        }
+
+        .search_wrap {
+            input {
+                font-size: 16px;
+                color: $color;
+                background: $background;
+                border: none;
+                box-shadow: none;
+                border-radius: 4px;
+                padding: 6px 12px;
+            }
+        }
     }
 
-    .search_wrap{
-        input{
-            font-size: 16px;
-            color: #fff;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            box-shadow: none;
-            border-radius: 4px;
-            padding: 6px 12px;
+    p {
+        margin-bottom: 0;
+        font-size: 14px;
+    }
+
+    .timer_wrap {
+        padding: $y-margin $x-margin $y-margin;
+        color: $color;
+        min-height: calc(100vh - #{$header-h});
+
+        h3 {
+            font-weight: normal;
+            margin-bottom: 0;
+            font-size: 20px;
+            padding: 4px 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            li {
+                border-bottom: 3px solid $accent;
+                //padding-bottom: $y-margin;
+                padding-top: $y-margin;
+                position: relative;
+
+                &:last-child {
+                    border-bottom: none;
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                }
+
+                .arrow_wrap {
+                    position: relative;
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        top: 50%;
+                        left: 100%;
+                        transform: translate(-32px, -50%);
+                        width: 0;
+                        height: 0;
+                        border-style: solid;
+                        border-right: 12px solid transparent;
+                        border-left: 12px solid transparent;
+                        border-top: 20px solid #fff;
+                        border-bottom: 0;
+                        z-index: 2;
+                        transition: all 0.6s;
+                    }
+
+                    &::before {
+                        content: '';
+                        position: absolute;
+                        top: 50%;
+                        left: 100%;
+                        transform: translate(-100%, -50%);
+                        width: 40px;
+                        height: 40px;
+                        z-index: 1;
+                        background: $accent;
+                        border-radius: 6px;
+                        transition: all 0.6s;
+                    }
+
+                    .img_wrap {
+                        max-height: 40px;
+                        opacity: 0.6;
+                        overflow: hidden;
+                        transition: all 0.6s;
+                        background: #000;
+                        border-radius: 6px;
+
+                        &:hover {
+                            opacity: 1;
+                        }
+
+                        img {
+                            height: 100%;
+                            width: 100%;
+                            object-fit: cover;
+                        }
+                    }
+
+                    &.active {
+                        .img_wrap {
+                            max-height: 100vh;
+                            opacity: 1;
+                            transition: all 0.6s;
+                        }
+
+                        &::after {
+                            top: 100%;
+                            transform: translate(-32px, -32px);
+                            border-right: 12px solid transparent;
+                            border-left: 12px solid transparent;
+                            border-bottom: 20px solid #fff;
+                            border-top: 0;
+                            transition: all 0.6s;
+                        }
+
+                        &::before {
+                            top: 100%;
+                            transform: translate(-100%, -100%);
+                            transition: all 0.6s;
+                        }
+                    }
+                }
+
+                .text_wrap {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: $y-margin;
+
+                    .category_wrap {
+                        font-family: 'Zen Maru Gothic', serif;
+                        font-size: 20px;
+                        background: #fff;
+                        padding: 3px 0 4px;
+                        width: 80px;
+                        border-radius: 6px;
+                        border: 3px solid $accent;
+                        text-align: center;
+                        font-weight: 500;
+                    }
+
+                    .flex {
+                        display: flex;
+                        align-items: flex-end;
+                        justify-content: space-between;
+                        flex: 1;
+                        margin-left: 16px;
+
+                        p {
+                            font-size: 18px;
+                            font-weight: 500;
+
+                            &:last-child {
+                                font-size: 14px;
+                            }
+                        }
+                    }
+                }
+
+                .remark_wrap {
+                    margin-top: $y-margin;
+
+                    p {
+                        font-size: 14px;
+                    }
+                }
+
+                .icon_wrap {
+                    text-align: right;
+
+                    button {
+                        background: none;
+                        box-shadow: none;
+                        border: none;
+                        width: 24px;
+                        height: 24px;
+                        padding: 0;
+                        margin-left: 4px;
+
+                        img {
+                            width: 16px;
+                            margin: auto;
+                            opacity: 0.3;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    h1 {
+        font-weight: bold;
+
+        span {
+            font-weight: normal;
+            font-size: 20px;
         }
     }
 }
-body{
-    background: $background;
-}
-#app{
+
+#app {
     background: $background;
     max-width: 450px;
     margin: auto;
     box-shadow: 0 0 8px $box-shadow;
-}
-
-p {
-    margin-bottom: 0;
-    font-size: 14px;
-}
-.timer_wrap{
-    padding: $y-margin $x-margin $y-margin;
-    color: #fff;
-    min-height: calc(100vh - #{$header-h});
-
-    h3{
-        font-weight: normal;
-    }
-
-    ul{
-        list-style: none;
-        padding: 0;
-        margin: 0;
-
-        li{
-            border-bottom: 1px solid #fff;
-            padding-bottom: $y-margin;
-            margin-bottom: $y-margin;
-
-            &:last-child{
-                border-bottom: none;
-                margin-bottom: 0;
-                padding-bottom: 0;
-            }
-
-            .img_wrap{
-                max-height: 40px;
-                opacity: 0.3;
-                overflow: hidden;
-                transition: all 0.6s;
-                position: relative;
-
-                &.active{
-                    max-height: 100vh;
-                    opacity: 1;
-                    transition: all 0.6s;
-                }
-
-                &:hover{
-                    opacity: 1;
-                }
-
-                img{
-                    height: 100%;
-                    width: 100%;
-                    object-fit: cover;
-                }
-            }
-            .text_wrap{
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 12px;
-            }
-
-            .remark_wrap {
-                margin-top: 12px;
-
-                p {
-                    font-size: 12px;
-                }
-            }
-        }
-    }
-}
-h1 {
-    font-weight: bold;
-
-    span {
-        font-weight: normal;
-        font-size: 20px;
-    }
+    padding-top: 68px;
 }
 </style>
